@@ -1,6 +1,7 @@
-import { createMachine, assign,ActorRefFrom } from "xstate";
+import { createMachine, assign,ActorRefFrom, raise } from "xstate";
 import { elementReady, getViewportSize } from "../helpers/utils";
 import {dragDropMachine} from './dragmachine'
+
 
 export type MachineContext = {
     container_id: string
@@ -14,19 +15,17 @@ export type MachineState =
     | { value: "loading.attach_events"; context: MachineContext }
     | { value: "idle"; context: MachineContext }
     | { value: "start"; context: MachineContext }
+    | { value: "start.idle"; context: MachineContext }
 
 
 
-export type MachineEvent =
-    | {
+
+ export   type MachineEvent = |    {
         type: 'EVENTS.APP.RELOAD'
+    }   | {
+        type: 'EVENTS.APP.ERROR',
+        message: string
     }
-
-
-
-
-
-
 
 export const appMgmtMachine = createMachine<
     MachineContext,
@@ -52,12 +51,13 @@ export const appMgmtMachine = createMachine<
                         onDone:{
                             target: "setup_viewport",
                             actions:[
-                                (_,e)=>console.log("appmgmtmachine.locading.wait_for_root finished")
+                                (_,e)=>console.log("appmgmtmachine.loading.wait_for_root finished")
                             ]
                         },
                         onError:{
                             actions:[
-                                (_,e)=>console.log("appmgmtmachine.locading.wait_for_root error",e )
+                                (_,e)=>console.log("appmgmtmachine.loading.wait_for_root error",e ),
+                                //raise({type: 'EVENTS.APP.ERROR', message: "sef"})
                             ],
                             target: "#error"
                         }
@@ -96,6 +96,15 @@ export const appMgmtMachine = createMachine<
             id: "start",
             entry: (_, e) => console.log("appmgmtmachine.start entry"),
             exit: (_, e) => console.log("appmgmtmachine.start exit", e),
+
+            initial: "idle",
+            states:{
+                idle:{
+                    entry: (_, e) => console.log("appmgmtmachine.start.idle entry"),
+                    exit: (_, e) => console.log("appmgmtmachine.start.idle exit", e),
+        
+                }
+            }
             // invoke:[
             //     {
 

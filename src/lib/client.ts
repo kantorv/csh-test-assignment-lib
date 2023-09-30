@@ -52,12 +52,14 @@ export class ApplicationManager {
     }
 
     public static getInstance(): ApplicationManager {
-       
+        console.log("[ApplicationManager] getInstance called",ApplicationManager.instance?.id )
         if (!ApplicationManager.instance) {
           ApplicationManager.instance = new ApplicationManager();
+          console.log("[ApplicationManager] new instance created",ApplicationManager.instance.id )
         }
 
-        console.log("[ApplicationManager] getInstance called",ApplicationManager.instance.id )
+
+        
 
         return ApplicationManager.instance;
     }
