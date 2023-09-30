@@ -12,9 +12,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "tsup": "^7.2.0"
-  },
+
   "tsup": {
     "entry": [
       "src/index.ts"
@@ -46,6 +44,12 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "typescript": "^5.2.2"
+    "rxjs": "^7.8.1",
+    "typescript": "^5.2.2",
+    "xstate": "^4.38.2"
+  },
+  "devDependencies": {
+    "tsup": "^7.2.0",
+    "@xstate/inspect": "^0.8.0"
   }
 }

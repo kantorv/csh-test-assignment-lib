@@ -1,28 +1,55 @@
+import { interpret } from 'xstate'
+import { appMgmtMachine, type ApiMachineActorType } from "../machines/appMgmtMachine";
 import { getRandomInt } from "../helpers/mathfuncs";
+import { Viewport } from './viewport';
 
 
 export class ApplicationManager {
-    readonly id:number
+    public readonly id:number
     private static instance: ApplicationManager;
+    public vp = {} as Viewport
+    public service = {} as ApiMachineActorType
+    private containerId = "csh-app-root"
 
     private constructor() { 
         const _id = getRandomInt()
         this.id = _id
         console.log("[ApplicationManager] constructor called", _id)
+
+        this.setupViewport()
+        this.setupService()
+        
+
+        console.log("[ApplicationManager] after setupViewport notify", _id)
+
+        
     }
 
-    /**
-    * Returns the average of two numbers.
-    *
-    * @remarks
-    * This method is part of the {@link core-library#Statistics | Statistics subsystem}.
-    *
-    * @param x - The first input number
-    * @param y - The second input number
-    * @returns The arithmetic mean of `x` and `y`
-    *
-    * @beta
-    */
+    private setupService(){
+      console.log("ApplicationManager.setupService called")
+      const service = interpret(appMgmtMachine.withContext({
+        container_id: "csh-app-root"
+      }), {
+        devTools: true,
+        execute: false // do not execute actions on state transitions
+      });
+      
+      service.onTransition((state) => {
+        // execute actions on next animation frame
+        // instead of immediately
+        console.log("ApplicationManager.service.onTransition.state", state.value,state.event)
+        requestAnimationFrame(() => service.execute(state));
+      });
+
+   
+      
+      service.start();
+      this.service = service
+    }
+
+    private setupViewport(){
+      this.vp = new Viewport(this.containerId)
+    }
 
     public static getInstance(): ApplicationManager {
        
@@ -30,7 +57,7 @@ export class ApplicationManager {
           ApplicationManager.instance = new ApplicationManager();
         }
 
-        console.log("[ApplicationManager] getInstance called111",ApplicationManager.instance.id )
+        console.log("[ApplicationManager] getInstance called",ApplicationManager.instance.id )
 
         return ApplicationManager.instance;
     }
